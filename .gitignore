@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ML artifacts
+models/*.joblib
+models/*.pkl
+models/*.keras
+models/*.h5
+
+# Vector database runtime artifacts
+vector_store/*
+
+# MLflow
+mlruns/
+
+# Airflow runtime
+airflow/logs/
+airflow/airflow.db
+airflow/airflow-webserver.pid
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+#data
+*.csv
