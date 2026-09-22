@@ -11,3 +11,8 @@ joblib
 fastapi
 uvicorn
 tensorflow
+sentence-transformers
+faiss-cpu
+langchain
+langgraph
+shap

@@ -1,0 +1,64 @@
+{
+  "dataset": "transaction_text_dataset.csv",
+  "random_state": 42,
+  "models": [
+    {
+      "model": "Pretrained MiniLM",
+      "accuracy": 0.6191666666666666,
+      "precision": 0.08745247148288973,
+      "recall": 0.6234939759036144,
+      "f1": 0.1533901444979622,
+      "roc_auc": 0.6695414331992756,
+      "inference_time_seconds": 143.4485832999926,
+      "epochs_trained": null
+    },
+    {
+      "model": "CNN",
+      "accuracy": 0.7673333333333333,
+      "precision": 0.09202453987730061,
+      "recall": 0.3614457831325301,
+      "f1": 0.1466992665036675,
+      "roc_auc": 0.6175798819838281,
+      "inference_time_seconds": 0.2909407999832183,
+      "epochs_trained": 5.0
+    },
+    {
+      "model": "Attention/Transformer",
+      "accuracy": 0.9103333333333333,
+      "precision": 0.1423611111111111,
+      "recall": 0.12349397590361445,
+      "f1": 0.13225806451612904,
+      "roc_auc": 0.6802876644191445,
+      "inference_time_seconds": 0.7122241000179201,
+      "epochs_trained": 4.0
+    },
+    {
+      "model": "Simple RNN",
+      "accuracy": 0.8678333333333333,
+      "precision": 0.10327022375215146,
+      "recall": 0.18072289156626506,
+      "f1": 0.13143483023001096,
+      "roc_auc": 0.6161530384062716,
+      "inference_time_seconds": 1.3357590000377968,
+      "epochs_trained": 5.0
+    },
+    {
+      "model": "LSTM",
+      "accuracy": 0.7593333333333333,
+      "precision": 0.08069381598793364,
+      "recall": 0.32228915662650603,
+      "f1": 0.12907117008443908,
+      "roc_auc": 0.5809309928493083,
+      "inference_time_seconds": 1.1516564000048675,
+      "epochs_trained": 4.0
+    }
+  ],
+  "best_by_f1": {
+    "model": "Pretrained MiniLM",
+    "f1": 0.1533901444979622
+  },
+  "best_by_roc_auc": {
+    "model": "Attention/Transformer",
+    "roc_auc": 0.6802876644191445
+  }
+}
