@@ -1,5 +1,7 @@
 """Schemas for grounded fraud-investigation retrieval responses."""
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -29,3 +31,4 @@ class InvestigationResponse(BaseModel):
     recommended_next_steps: list[str]
     sources: list[InvestigationSource]
     evidence_insufficient: bool
+    generation_mode: Literal["llm", "fallback"]

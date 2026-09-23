@@ -14,5 +14,8 @@ tensorflow
 sentence-transformers
 faiss-cpu
 langchain
+langchain-openai
+langchain-groq
+langchain-ollama
 langgraph
 shap
