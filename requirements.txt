@@ -19,3 +19,4 @@ langchain-groq
 langchain-ollama
 langgraph
 shap
+apache-airflow

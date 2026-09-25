@@ -5,6 +5,9 @@ from time import perf_counter
 from fastapi import FastAPI, Request
 from starlette.middleware.base import RequestResponseEndpoint
 
+from app.api.routes.analysis import router as analysis_router
+from app.api.routes.investigation import router as investigation_router
+from app.api.routes.operations import router as operations_router
 from app.api.routes.prediction import router as prediction_router
 from app.services.monitoring_service import monitoring_service
 
@@ -35,3 +38,6 @@ async def monitor_prediction_request(
 
 
 app.include_router(prediction_router)
+app.include_router(operations_router)
+app.include_router(analysis_router)
+app.include_router(investigation_router)
