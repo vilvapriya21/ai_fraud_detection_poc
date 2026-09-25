@@ -13,6 +13,7 @@ from app.services.model_comparison_service import (
     ModelComparisonUnavailableError,
     model_comparison_service,
 )
+from app.services.monitoring_service import monitoring_service
 from app.services.prediction_service import ModelUnavailableError, prediction_service
 from app.services.agent_investigation_service import agent_investigation_service
 from app.services.explainability_service import ExplainabilityUnavailableError, explainability_service
@@ -21,6 +22,13 @@ from app.services.similar_case_service import SimilarCaseUnavailableError, simil
 from app.services.security_service import security_service
 
 router = APIRouter(tags=["prediction"])
+
+
+@router.get("/metrics")
+def metrics() -> dict[str, int | float | None]:
+    """Return in-memory runtime metrics for prediction requests."""
+
+    return monitoring_service.get_metrics()
 
 
 @router.get("/health", response_model=HealthResponse)

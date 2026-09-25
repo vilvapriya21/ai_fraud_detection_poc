@@ -1,0 +1,16 @@
+.git
+.venv
+.env
+.pytest_cache
+__pycache__
+*.py[cod]
+*.log
+.ipynb_checkpoints
+.vscode
+.idea
+notebooks
+tests
+mlruns
+mlflow.db
+data/raw
+data/processed/transaction_text_dataset.csv

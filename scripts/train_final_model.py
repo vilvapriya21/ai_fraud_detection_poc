@@ -9,8 +9,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import joblib
+import mlflow
+import mlflow.sklearn
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
@@ -21,6 +24,8 @@ from app.ml.preprocessing import (
 
 DATA_PATH = PROJECT_ROOT / "data" / "processed" / "bank_fraud_poc_sample.csv"
 MODEL_PATH = PROJECT_ROOT / "models" / "fraud_detection_pipeline.joblib"
+MLFLOW_TRACKING_URI = f"sqlite:///{(PROJECT_ROOT / 'mlflow.db').resolve().as_posix()}"
+MLFLOW_EXPERIMENT_NAME = "fraud_detection_final_model"
 
 RANDOM_STATE = 42
 
@@ -81,6 +86,58 @@ def save_model(
     )
 
 
+def evaluate_model(
+    model: Pipeline,
+    features: pd.DataFrame,
+    target: pd.Series,
+) -> dict[str, float]:
+    """Calculate fraud-detection metrics for MLflow tracking."""
+
+    predictions = model.predict(features)
+    probabilities = model.predict_proba(features)[:, 1]
+
+    return {
+        "precision": precision_score(target, predictions, zero_division=0),
+        "recall": recall_score(target, predictions, zero_division=0),
+        "f1": f1_score(target, predictions, zero_division=0),
+        "roc_auc": roc_auc_score(target, probabilities),
+    }
+
+
+def log_final_model_to_mlflow(
+    model: Pipeline,
+    test_features: pd.DataFrame,
+    test_target: pd.Series,
+    model_path: Path,
+) -> None:
+    """Log the selected fitted model, metrics, and local artifact reference."""
+
+    classifier = model.named_steps["classifier"]
+    classifier_parameters = {
+        f"classifier_{name}": value
+        for name, value in classifier.get_params().items()
+    }
+    metrics = evaluate_model(model, test_features, test_target)
+
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
+
+    with mlflow.start_run(run_name="final_random_forest"):
+        mlflow.log_params(classifier_parameters)
+        mlflow.log_metrics(metrics)
+        mlflow.set_tag("model_type", "RandomForestClassifier")
+        mlflow.set_tag("local_model_path", str(model_path.relative_to(PROJECT_ROOT)))
+        mlflow.sklearn.log_model(
+            model,
+            name="fraud_detection_pipeline",
+            skops_trusted_types=[
+                "numpy.dtype",
+                "sklearn.tree._tree.Tree",
+            ],
+        )
+        mlflow.log_artifact(str(model_path), artifact_path="model_reference")
+
+
 def main() -> None:
     """Train the selected model and save the complete pipeline."""
 
@@ -93,7 +150,7 @@ def main() -> None:
         DATA_PATH
     )
 
-    X_train, _, y_train, _ = train_test_split(
+    X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
         test_size=0.2,
@@ -114,6 +171,13 @@ def main() -> None:
 
     save_model(
         model,
+        MODEL_PATH,
+    )
+
+    log_final_model_to_mlflow(
+        model,
+        X_test,
+        y_test,
         MODEL_PATH,
     )
 
