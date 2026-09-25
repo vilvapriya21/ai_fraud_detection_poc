@@ -23,7 +23,7 @@ def model_comparison() -> dict:
     except ModelComparisonUnavailableError as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(error),
+            detail="SHAP explanation is temporarily unavailable.",
         ) from error
 
 
@@ -36,7 +36,7 @@ def explain(transaction: PredictionRequest) -> ExplainResponse:
     except ExplainabilityUnavailableError as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(error),
+            detail="Fairness analysis is temporarily unavailable.",
         ) from error
     return ExplainResponse(**response)
 

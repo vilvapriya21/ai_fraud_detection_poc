@@ -58,12 +58,19 @@ class ExplainabilityService:
         except ModelUnavailableError as error:
             raise ExplainabilityUnavailableError(str(error)) from error
 
-        model = self._load_model()
-        feature_frame = pd.DataFrame(
-            [transaction.model_dump()],
-            columns=PREDICTION_FEATURE_COLUMNS,
-        )
-        contributions = self._feature_contributions(model, feature_frame)
+        try:
+            model = self._load_model()
+            feature_frame = pd.DataFrame(
+                [transaction.model_dump()],
+                columns=PREDICTION_FEATURE_COLUMNS,
+            )
+            contributions = self._feature_contributions(model, feature_frame)
+        except ExplainabilityUnavailableError:
+            raise
+        except Exception as error:
+            raise ExplainabilityUnavailableError(
+                "SHAP explanation is temporarily unavailable."
+            ) from error
         return {
             "prediction": prediction.prediction,
             "fraud_probability": prediction.fraud_probability,
@@ -74,7 +81,14 @@ class ExplainabilityService:
         """Return cached group metrics computed from the deterministic held-out split."""
 
         if self._fairness_summary is None:
-            self._fairness_summary = self._compute_fairness_summary()
+            try:
+                self._fairness_summary = self._compute_fairness_summary()
+            except ExplainabilityUnavailableError:
+                raise
+            except Exception as error:
+                raise ExplainabilityUnavailableError(
+                    "Fairness analysis is temporarily unavailable."
+                ) from error
         return self._fairness_summary
 
     def _load_model(self) -> Pipeline:

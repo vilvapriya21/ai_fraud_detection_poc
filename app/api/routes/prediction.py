@@ -18,5 +18,5 @@ def predict(transaction: PredictionRequest) -> PredictionResponse:
     except ModelUnavailableError as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(error),
+            detail="Fraud prediction is temporarily unavailable.",
         ) from error

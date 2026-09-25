@@ -111,12 +111,19 @@ class InvestigationService:
                 "question and transaction_description must not be empty."
             )
 
-        return self._chain.invoke(
-            {
-                "question": question.strip(),
-                "transaction_description": transaction_description.strip(),
-            }
-        )
+        try:
+            return self._chain.invoke(
+                {
+                    "question": question.strip(),
+                    "transaction_description": transaction_description.strip(),
+                }
+            )
+        except InvestigationUnavailableError:
+            raise
+        except Exception as error:
+            raise InvestigationUnavailableError(
+                "Investigation retrieval is temporarily unavailable."
+            ) from error
 
     def _retrieve_context(
         self,
@@ -268,7 +275,6 @@ class InvestigationService:
         llm_client = self._get_llm_client()
 
         if llm_client is None:
-            print("LLM client is unavailable.")
             return self._fallback_answer(), "fallback"
 
         # Important:
@@ -307,11 +313,6 @@ class InvestigationService:
         )
 
         try:
-            print(
-                "Calling LLM provider:",
-                type(llm_client).__name__,
-            )
-
             response = llm_client.invoke(
                 prompt.format_messages(
                     question=question,
@@ -333,44 +334,18 @@ class InvestigationService:
                 )
             )
 
-            print("\n--- LLM DEBUG ---")
-            print("LLM ANSWER:")
-            print(answer)
-            print("HAS SOURCE CITATION:", citation_valid)
-            print("OUTPUT SAFE:", output_safe)
-            print("--- END LLM DEBUG ---\n")
-
             if not answer:
-                print(
-                    "Fallback reason: "
-                    "LLM returned an empty response."
-                )
                 return self._fallback_answer(), "fallback"
 
             if not citation_valid:
-                print(
-                    "Fallback reason: "
-                    "LLM response did not contain a valid "
-                    "source citation."
-                )
                 return self._fallback_answer(), "fallback"
 
             if not output_safe:
-                print(
-                    "Fallback reason: "
-                    "LLM response failed security validation."
-                )
                 return self._fallback_answer(), "fallback"
 
             return answer, "llm"
 
-        except Exception as error:
-            print(
-                "LLM generation error:",
-                type(error).__name__,
-                str(error),
-            )
-
+        except Exception:
             return self._fallback_answer(), "fallback"
 
     def _get_llm_client(self) -> Any | None:
@@ -384,24 +359,7 @@ class InvestigationService:
         try:
             self._llm_client = self._llm_factory()
 
-            if self._llm_client is None:
-                print(
-                    "LLM factory returned None. "
-                    "Check provider configuration."
-                )
-            else:
-                print(
-                    "LLM provider initialized:",
-                    type(self._llm_client).__name__,
-                )
-
-        except Exception as error:
-            print(
-                "LLM initialization error:",
-                type(error).__name__,
-                str(error),
-            )
-
+        except Exception:
             self._llm_client = None
             return None
 
@@ -608,7 +566,7 @@ class InvestigationService:
                     )
                 )
 
-            except OSError as error:
+            except Exception as error:
                 raise InvestigationUnavailableError(
                     "The saved embedding model is "
                     "unavailable locally. Run "

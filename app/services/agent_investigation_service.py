@@ -34,6 +34,10 @@ class CaseState(TypedDict, total=False):
     final_investigation_summary: str
 
 
+class AgentInvestigationUnavailableError(RuntimeError):
+    """Raised when the agent workflow or one of its required tools fails."""
+
+
 class AgentInvestigationService:
     """Coordinate triage, prediction, case retrieval, and summary agents with LangGraph."""
 
@@ -71,7 +75,12 @@ class AgentInvestigationService:
             "evidence": [f"Reported transaction description: {transaction_description.strip()}"],
             "tool_failures": [],
         }
-        final_state = self._graph.invoke(initial_state)
+        try:
+            final_state = self._graph.invoke(initial_state)
+        except Exception as error:
+            raise AgentInvestigationUnavailableError(
+                "Agent investigation is temporarily unavailable."
+            ) from error
         response = self._response_payload(final_state)
         with self._history_lock:
             self._case_history[response["case_id"]] = deepcopy(response)
@@ -153,8 +162,8 @@ class AgentInvestigationService:
                 f"Saved model output: {prediction.prediction}; risk level {prediction.risk_level}; "
                 f"fraud probability {prediction.fraud_probability:.4f}."
             )
-        except (ModelUnavailableError, ValueError, RuntimeError) as error:
-            failures.append(f"fraud_prediction_service: {error}")
+        except (ModelUnavailableError, ValueError, RuntimeError):
+            failures.append("fraud_prediction_service unavailable")
             findings["Fraud Analysis Agent"] = "Prediction tool was unavailable; no model conclusion was used."
         return {"agent_findings": findings, "tools_used": tools_used, "tool_failures": failures}
 
@@ -172,8 +181,8 @@ class AgentInvestigationService:
             tools_used.append("similar_case_service")
             sources.extend({"source_type": "similar_case", **case} for case in cases)
             findings["Similar Case / Evidence Agent"] = f"Retrieved {len(cases)} similar historical cases."
-        except (SimilarCaseUnavailableError, ValueError, RuntimeError) as error:
-            failures.append(f"similar_case_service: {error}")
+        except (SimilarCaseUnavailableError, ValueError, RuntimeError):
+            failures.append("similar_case_service unavailable")
             findings["Similar Case / Evidence Agent"] = "Similar-case retrieval was unavailable."
 
         return self._add_rag_context(
@@ -224,8 +233,8 @@ class AgentInvestigationService:
             else:
                 existing = findings.get(finding_name, "")
                 findings[finding_name] = f"{existing} {rag_response['investigation_response']}".strip()
-        except (InvestigationUnavailableError, ValueError, RuntimeError) as error:
-            failures.append(f"investigation_rag_service: {error}")
+        except (InvestigationUnavailableError, ValueError, RuntimeError):
+            failures.append("investigation_rag_service unavailable")
             if finding_name not in findings:
                 findings[finding_name] = "Investigation-context retrieval was unavailable."
         return {

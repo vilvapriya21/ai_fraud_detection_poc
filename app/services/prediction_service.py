@@ -108,9 +108,16 @@ class PredictionService:
             reason = self._load_error or "Model loading did not complete."
             raise ModelUnavailableError(reason)
 
-        feature_frame = self._to_feature_frame(transaction)
-        prediction_value = int(self._model.predict(feature_frame)[0])
-        fraud_probability = self._fraud_probability(feature_frame)
+        try:
+            feature_frame = self._to_feature_frame(transaction)
+            prediction_value = int(self._model.predict(feature_frame)[0])
+            fraud_probability = self._fraud_probability(feature_frame)
+        except ModelUnavailableError:
+            raise
+        except Exception as error:
+            raise ModelUnavailableError(
+                "Fraud prediction is temporarily unavailable."
+            ) from error
 
         return PredictionResponse(
             prediction="Fraudulent" if prediction_value == 1 else "Legitimate",

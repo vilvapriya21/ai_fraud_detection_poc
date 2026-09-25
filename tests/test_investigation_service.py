@@ -119,7 +119,7 @@ def test_llm_answer_is_grounded_in_retrieved_context() -> None:
     assert "POLICY-TEST" in prompt_text
 
 
-def test_llm_failure_uses_deterministic_fallback() -> None:
+def test_llm_failure_uses_deterministic_fallback(capsys) -> None:
     """Provider failures do not break investigation and retain the grounded fallback."""
 
     response = InvestigationService(llm_client=FailingLlm())._compose_response(
@@ -132,6 +132,9 @@ def test_llm_failure_uses_deterministic_fallback() -> None:
 
     assert response["generation_mode"] == "fallback"
     assert "does not establish" in response["investigation_response"]
+    captured = capsys.readouterr()
+    assert "provider unavailable" not in captured.out
+    assert "provider unavailable" not in captured.err
 
 
 def test_provider_factory_failure_uses_deterministic_fallback() -> None:

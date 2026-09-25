@@ -7,7 +7,10 @@ from app.schemas.agent_investigation import AgentInvestigationRequest, AgentInve
 from app.schemas.investigation import InvestigationRequest, InvestigationResponse
 from app.schemas.security import SecurityBlockedResponse
 from app.schemas.similar_case import SimilarCasesRequest, SimilarCasesResponse
-from app.services.agent_investigation_service import agent_investigation_service
+from app.services.agent_investigation_service import (
+    AgentInvestigationUnavailableError,
+    agent_investigation_service,
+)
 from app.services.investigation_service import InvestigationUnavailableError, investigation_service
 from app.services.security_service import security_service
 from app.services.similar_case_service import SimilarCaseUnavailableError, similar_case_service
@@ -25,7 +28,7 @@ def similar_cases(request: SimilarCasesRequest) -> SimilarCasesResponse:
     except SimilarCaseUnavailableError as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(error),
+            detail="Similar-case search is temporarily unavailable.",
         ) from error
     return SimilarCasesResponse(cases=cases)
 
@@ -52,7 +55,7 @@ def investigate(request: InvestigationRequest) -> InvestigationResponse | JSONRe
     except InvestigationUnavailableError as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(error),
+            detail="Investigation retrieval is temporarily unavailable.",
         ) from error
     return InvestigationResponse(**response)
 
@@ -71,9 +74,23 @@ def agent_investigate(request: AgentInvestigationRequest) -> AgentInvestigationR
             status_code=status.HTTP_400_BAD_REQUEST,
             content=security_service.blocked_response(decision.blocked_category or "unsafe_content"),
         )
-    response = agent_investigation_service.investigate(
-        decision.question,
-        decision.transaction_description,
-        request.transaction,
-    )
+    try:
+        response = agent_investigation_service.investigate(
+            decision.question,
+            decision.transaction_description,
+            request.transaction,
+        )
+    except AgentInvestigationUnavailableError as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Agent investigation is temporarily unavailable.",
+        ) from error
+    if response["tool_failures"]:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "Agent investigation is temporarily unavailable because "
+                "a required tool failed."
+            ),
+        )
     return AgentInvestigationResponse(**response)

@@ -55,30 +55,42 @@ class SimilarCaseService:
         if not description.strip():
             raise ValueError("description must not be empty.")
 
-        cases, index = self._load_assets()
-        query_embedding = self._get_embedding_model().encode(
-            [description],
-            convert_to_numpy=True,
-            normalize_embeddings=True,
-            show_progress_bar=False,
-        )
-        result_count = min(top_k, len(cases))
-        scores, positions = index.search(query_embedding.astype("float32"), result_count)
-
-        results: list[dict[str, Any]] = []
-        for score, position in zip(scores[0], positions[0], strict=True):
-            if position < 0:
-                continue
-            case = cases[int(position)]
-            results.append(
-                {
-                    "case_id": case["case_id"],
-                    "fraud_type": case["fraud_type"],
-                    "key_observations": case["key_observations"],
-                    "outcome": case["outcome"],
-                    "similarity_score": float(score),
-                }
+        try:
+            cases, index = self._load_assets()
+            query_embedding = self._get_embedding_model().encode(
+                [description],
+                convert_to_numpy=True,
+                normalize_embeddings=True,
+                show_progress_bar=False,
             )
+            result_count = min(top_k, len(cases))
+            scores, positions = index.search(query_embedding.astype("float32"), result_count)
+        except SimilarCaseUnavailableError:
+            raise
+        except Exception as error:
+            raise SimilarCaseUnavailableError(
+                "Similar-case search is temporarily unavailable."
+            ) from error
+
+        try:
+            results: list[dict[str, Any]] = []
+            for score, position in zip(scores[0], positions[0], strict=True):
+                if position < 0:
+                    continue
+                case = cases[int(position)]
+                results.append(
+                    {
+                        "case_id": case["case_id"],
+                        "fraud_type": case["fraud_type"],
+                        "key_observations": case["key_observations"],
+                        "outcome": case["outcome"],
+                        "similarity_score": float(score),
+                    }
+                )
+        except Exception as error:
+            raise SimilarCaseUnavailableError(
+                "Similar-case search is temporarily unavailable."
+            ) from error
         return results
 
     def _load_assets(self) -> tuple[list[dict[str, str]], faiss.Index]:
@@ -117,7 +129,7 @@ class SimilarCaseService:
                     device="cpu",
                     local_files_only=True,
                 )
-            except OSError as error:
+            except Exception as error:
                 raise SimilarCaseUnavailableError(
                     "The saved embedding model is unavailable locally. Run "
                     "scripts/build_similar_case_index.py first."
