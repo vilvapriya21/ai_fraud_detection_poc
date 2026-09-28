@@ -38,6 +38,7 @@ vector_store/*
 mlruns/
 
 mlflow.db
+mlflow_runtime.db
 
 # Airflow runtime
 airflow/logs/

@@ -24,7 +24,8 @@ from app.ml.preprocessing import (
 
 DATA_PATH = PROJECT_ROOT / "data" / "processed" / "bank_fraud_poc_sample.csv"
 MODEL_PATH = PROJECT_ROOT / "models" / "fraud_detection_pipeline.joblib"
-MLFLOW_TRACKING_URI = (PROJECT_ROOT / "mlruns").resolve().as_uri()
+MLFLOW_TRACKING_URI = f"sqlite:///{(PROJECT_ROOT / 'mlflow_runtime.db').resolve().as_posix()}"
+MLFLOW_ARTIFACT_ROOT = PROJECT_ROOT / "mlruns"
 MLFLOW_EXPERIMENT_NAME = "fraud_detection_final_model"
 
 RANDOM_STATE = 42
@@ -120,6 +121,11 @@ def log_final_model_to_mlflow(
     metrics = evaluate_model(model, test_features, test_target)
 
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    if mlflow.get_experiment_by_name(MLFLOW_EXPERIMENT_NAME) is None:
+        mlflow.create_experiment(
+            MLFLOW_EXPERIMENT_NAME,
+            artifact_location=MLFLOW_ARTIFACT_ROOT.resolve().as_uri(),
+        )
     mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
 
     with mlflow.start_run(run_name="final_random_forest"):
