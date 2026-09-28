@@ -24,7 +24,7 @@ from app.ml.preprocessing import (
 
 DATA_PATH = PROJECT_ROOT / "data" / "processed" / "bank_fraud_poc_sample.csv"
 MODEL_PATH = PROJECT_ROOT / "models" / "fraud_detection_pipeline.joblib"
-MLFLOW_TRACKING_URI = f"sqlite:///{(PROJECT_ROOT / 'mlflow.db').resolve().as_posix()}"
+MLFLOW_TRACKING_URI = (PROJECT_ROOT / "mlruns").resolve().as_uri()
 MLFLOW_EXPERIMENT_NAME = "fraud_detection_final_model"
 
 RANDOM_STATE = 42

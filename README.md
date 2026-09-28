@@ -128,10 +128,10 @@ pytest -v
 
 ## MLflow
 
-`scripts/train_final_model.py` logs final-model parameters, Precision, Recall, F1, ROC-AUC, and model artifacts to the local `mlflow.db` store.
+`scripts/train_final_model.py` logs final-model parameters, Precision, Recall, F1, ROC-AUC, and model artifacts to the local `mlruns` file store.
 
 ```powershell
-mlflow ui --backend-store-uri sqlite:///mlflow.db
+mlflow ui --backend-store-uri ./mlruns
 ```
 
 ## Docker
