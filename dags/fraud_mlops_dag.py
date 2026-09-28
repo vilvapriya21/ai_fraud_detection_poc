@@ -9,7 +9,7 @@ import sys
 import joblib
 import pandas as pd
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
 
@@ -89,7 +89,7 @@ with DAG(
     dag_id="fraud_mlops_dag",
     description="Validate saved fraud assets and run lightweight evaluation.",
     start_date=datetime(2024, 1, 1),
-    schedule=None,
+    schedule="@daily",
     catchup=False,
     tags=["fraud", "mlops", "poc"],
 ) as dag:

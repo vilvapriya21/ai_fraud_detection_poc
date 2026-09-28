@@ -147,7 +147,7 @@ Raw source data must remain unchanged.
 Current source dataset location:
 
 ```text
-data/raw/fraud_detection.csv
+data/raw/bank_fraud.csv
 ```
 
 Never overwrite the raw dataset.
@@ -179,7 +179,7 @@ Only use public, anonymized, or synthetic data.
 The supervised fraud target is:
 
 ```text
-Fraudulent
+is_fraud
 ```
 
 Values:
@@ -189,9 +189,9 @@ Values:
 1 = fraudulent
 ```
 
-Do not use identifiers such as `Transaction_ID` as predictive ML features.
+Do not use identifiers such as `transaction_id` as predictive ML features.
 
-Treat `User_ID` as an identifier unless an experiment explicitly justifies its use.
+Treat `customer_id` as an identifier unless an experiment explicitly justifies its use.
 
 Always check for data leakage before training.
 

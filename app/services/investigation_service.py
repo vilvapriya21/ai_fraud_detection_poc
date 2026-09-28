@@ -340,9 +340,7 @@ class InvestigationService:
             )
 
             logger.debug(
-                "--- LLM DEBUG ---\nLLM ANSWER:\n%s\nHAS SOURCE CITATION: %s\n"
-                "OUTPUT SAFE: %s\n--- END LLM DEBUG ---",
-                answer,
+                "LLM response metadata: citation_valid=%s, output_safe=%s",
                 citation_valid,
                 output_safe,
             )

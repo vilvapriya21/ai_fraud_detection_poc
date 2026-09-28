@@ -30,6 +30,44 @@ The early Phase 1 notebooks use `data/raw/fraud_detection.csv` with target `Frau
 
 The application uses the public [Bank Transaction Fraud Detection Dataset](https://www.kaggle.com/datasets/nafiulislam490/bank-transaction-fraud-detection-dataset) by `nafiulislam490`, with target `is_fraud`. Download the dataset and place its transaction CSV at `data/raw/bank_fraud.csv`. A deterministic 100,000-row stratified working sample is written to `data/processed/bank_fraud_poc_sample.csv`. The raw public dataset is never overwritten.
 
+## Model Selection and Explainability Evidence
+
+### Tabular model selection
+
+The recorded tuning results in `notebooks/07_model_tuning_selected_dataset.ipynb` used the same held-out split and F1 as the selection metric for the imbalanced fraud task.
+
+| Method | Precision | Recall | F1 | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: |
+| Grid Search Random Forest | 0.1101 | 0.5412 | 0.1830 | 0.7149 |
+| Random Search Random Forest | 0.1240 | 0.4326 | 0.1927 | 0.7149 |
+| Bayesian Optuna Random Forest | 0.1086 | 0.5529 | 0.1815 | 0.7157 |
+
+The saved pipeline uses the Random Search configuration: 300 trees, `max_depth=16`, `min_samples_split=4`, `min_samples_leaf=4`, `max_features=log2`, and balanced class weights. It was selected because it achieved the highest held-out F1 (0.1927); Grid Search and Bayesian optimization had slightly higher recall or ROC-AUC but lower F1.
+
+### Text-model comparison
+
+The recorded comparison in `data/processed/text_model_comparison_results.json` is an experiment on `transaction_text_dataset.csv`, not a replacement for the deployed tabular Random Forest.
+
+| Model | F1 | ROC-AUC | Inference time (s) | Practical trade-off |
+| --- | ---: | ---: | ---: | --- |
+| Pretrained MiniLM | 0.1534 | 0.6695 | 143.4486 | Best F1 and recall in this text experiment, but materially slow. |
+| CNN | 0.1467 | 0.6176 | 0.2909 | Fastest neural option, with lower F1 and ROC-AUC. |
+| Attention/Transformer | 0.1323 | 0.6803 | 0.7122 | Best ROC-AUC, but low recall and F1 at the recorded threshold. |
+| Simple RNN | 0.1314 | 0.6162 | 1.3358 | Lower discrimination than the attention model and slower than CNN. |
+| LSTM | 0.1291 | 0.5809 | 1.1517 | Lowest recorded ROC-AUC among the compared architectures. |
+
+### Representative SHAP explanations
+
+The following five representative rows were generated with the existing saved pipeline and Tree SHAP implementation from the processed sample. Positive SHAP values increase the fraud score; negative values decrease it. They are local model evidence, not causal explanations.
+
+| Example | Actual `is_fraud` | Prediction / fraud probability | Top SHAP features (value: SHAP) |
+| --- | ---: | --- | --- |
+| Legitimate 1 | 0 | Legitimate / 0.135818 | `is_night_transaction=0`: -0.056495; `merchant_category=Education`: -0.054065; `failed_attempts=0`: -0.047453 |
+| Legitimate 2 | 0 | Legitimate / 0.136256 | `merchant_category=Education`: -0.053962; `is_night_transaction=0`: -0.052775; `failed_attempts=0`: -0.051407 |
+| Legitimate 3 | 0 | Legitimate / 0.140746 | `is_night_transaction=0`: -0.062805; `merchant_category=Education`: -0.060573; `failed_attempts=0`: -0.049910 |
+| High-risk 1 | 1 | Fraudulent / 0.854379 | `failed_attempts=3`: +0.133758; `is_international=1`: +0.079374; `merchant_category=Crypto Exchange`: +0.045462 |
+| High-risk 2 | 1 | Fraudulent / 0.853950 | `failed_attempts=3`: +0.129489; `is_international=1`: +0.073818; `merchant_category=ATM Withdrawal`: +0.051480 |
+
 ## Setup
 
 ```powershell
@@ -153,7 +191,7 @@ For Ollama from a Docker container, configure `OLLAMA_BASE_URL=http://host.docke
 
 ## Airflow
 
-`dags/fraud_mlops_dag.py` validates the processed sample, final model, FAISS/knowledge-base assets, and runs a lightweight deterministic evaluation without retraining.
+`dags/fraud_mlops_dag.py` runs daily with `catchup=False`. Each run validates the processed sample, final model, and FAISS/knowledge-base assets, then performs a lightweight deterministic evaluation without retraining. The scheduler only creates future daily runs; it does not backfill historical intervals.
 
 ```powershell
 $env:AIRFLOW__CORE__DAGS_FOLDER = (Resolve-Path .\dags)
