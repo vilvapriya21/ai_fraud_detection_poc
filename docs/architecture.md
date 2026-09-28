@@ -36,7 +36,7 @@ flowchart TB
     Agents --> CaseSearch
     Agents --> RAG
 
-    RawData[Public raw bank fraud CSV] --> Build[Runtime artifact build script]
+    RawData[Kaggle bank transaction fraud CSV] --> Build[Runtime artifact build script]
     Build --> ProcessedData
     Build --> Pipeline
     Build --> CaseData
@@ -61,5 +61,6 @@ flowchart TB
 - **Retrieval and investigation:** MiniLM creates embeddings for persisted FAISS indexes. Similar-case search retrieves historical cases; LangChain RAG retrieves policy, guideline, and case context before using a configured LLM or its deterministic fallback.
 - **LLM and security:** the provider factory selects OpenAI, Groq, or Ollama from environment variables. The security service validates investigation inputs, filters retrieved content as untrusted, and checks generated output.
 - **Agents:** the LangGraph workflow routes simple cases to direct assessment and complex cases through Fraud Analysis, Similar Case/Evidence, and Investigation Summary agents, using the existing services as tools.
+- **Data:** local and demo artifact builds use the public [Bank Transaction Fraud Detection Dataset](https://www.kaggle.com/datasets/nafiulislam490/bank-transaction-fraud-detection-dataset) by `nafiulislam490`, placed at `data/raw/bank_fraud.csv`. CI instead generates a deterministic synthetic file at that path solely to make tests and image builds self-sufficient.
 - **MLOps:** final-model training logs parameters, metrics, and artifacts to local MLflow. The Airflow DAG validates saved runtime assets and performs a lightweight deterministic model evaluation without retraining.
 - **Delivery:** Docker packages the FastAPI app, saved model, FAISS indexes, and knowledge-base artifacts. GitHub Actions installs dependencies, runs pytest, and builds the Docker image; it does not deploy.

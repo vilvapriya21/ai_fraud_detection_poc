@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 from typing import Any, Callable
 
@@ -16,6 +17,8 @@ from app.llm.factory import create_chat_model
 from app.services.security_service import security_service
 from app.services.similar_case_service import EMBEDDING_MODEL_NAME, project_root
 
+
+logger = logging.getLogger(__name__)
 
 MINIMUM_RELEVANCE_SCORE = 0.42
 
@@ -275,6 +278,7 @@ class InvestigationService:
         llm_client = self._get_llm_client()
 
         if llm_client is None:
+            logger.warning("LLM client is unavailable; using deterministic fallback.")
             return self._fallback_answer(), "fallback"
 
         # Important:
@@ -313,6 +317,7 @@ class InvestigationService:
         )
 
         try:
+            logger.info("Calling configured LLM provider: %s", type(llm_client).__name__)
             response = llm_client.invoke(
                 prompt.format_messages(
                     question=question,
@@ -334,18 +339,30 @@ class InvestigationService:
                 )
             )
 
+            logger.debug(
+                "--- LLM DEBUG ---\nLLM ANSWER:\n%s\nHAS SOURCE CITATION: %s\n"
+                "OUTPUT SAFE: %s\n--- END LLM DEBUG ---",
+                answer,
+                citation_valid,
+                output_safe,
+            )
+
             if not answer:
+                logger.warning("LLM returned an empty response; using deterministic fallback.")
                 return self._fallback_answer(), "fallback"
 
             if not citation_valid:
+                logger.warning("LLM response lacks a valid source citation; using deterministic fallback.")
                 return self._fallback_answer(), "fallback"
 
             if not output_safe:
+                logger.warning("LLM response failed safety validation; using deterministic fallback.")
                 return self._fallback_answer(), "fallback"
 
             return answer, "llm"
 
         except Exception:
+            logger.exception("LLM generation failed; using deterministic fallback.")
             return self._fallback_answer(), "fallback"
 
     def _get_llm_client(self) -> Any | None:
@@ -358,8 +375,16 @@ class InvestigationService:
 
         try:
             self._llm_client = self._llm_factory()
+            if self._llm_client is None:
+                logger.warning("LLM factory returned no client; using deterministic fallback.")
+            else:
+                logger.info(
+                    "Configured LLM provider initialized: %s",
+                    type(self._llm_client).__name__,
+                )
 
         except Exception:
+            logger.exception("LLM client initialization failed; using deterministic fallback.")
             self._llm_client = None
             return None
 

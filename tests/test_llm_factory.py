@@ -1,5 +1,11 @@
 """Tests for switchable provider configuration without real API calls."""
 
+import importlib
+from pathlib import Path
+
+from dotenv import main as dotenv_main
+from pytest import MonkeyPatch
+
 from app.llm.config import LlmConfig
 from app.llm import factory
 
@@ -70,3 +76,25 @@ def test_missing_or_invalid_provider_configuration_returns_none() -> None:
 
     assert factory.create_chat_model(LlmConfig.from_environment({"LLM_PROVIDER": "groq"})) is None
     assert factory.create_chat_model(LlmConfig.from_environment({"LLM_PROVIDER": "unknown"})) is None
+
+
+def test_application_startup_loads_llm_configuration_from_dotenv(
+    monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
+    """Application startup makes values in its .env file available to LlmConfig."""
+
+    dotenv_path = tmp_path / ".env"
+    dotenv_path.write_text("LLM_PROVIDER=ollama\nOLLAMA_MODEL=dotenv-model\n")
+    monkeypatch.delenv("LLM_PROVIDER", raising=False)
+    monkeypatch.delenv("OLLAMA_MODEL", raising=False)
+    monkeypatch.setattr(dotenv_main, "find_dotenv", lambda: str(dotenv_path))
+
+    import app.main as application
+
+    importlib.reload(application)
+
+    config = LlmConfig.from_environment()
+
+    assert config.provider == "ollama"
+    assert config.ollama_model == "dotenv-model"
+

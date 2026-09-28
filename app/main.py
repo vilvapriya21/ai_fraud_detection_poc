@@ -1,5 +1,9 @@
 """FastAPI application entry point for fraud prediction."""
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from time import perf_counter
 
 from fastapi import FastAPI, Request

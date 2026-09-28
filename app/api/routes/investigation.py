@@ -94,3 +94,13 @@ def agent_investigate(request: AgentInvestigationRequest) -> AgentInvestigationR
             ),
         )
     return AgentInvestigationResponse(**response)
+
+
+@router.get("/agent-investigate/{case_id}", response_model=AgentInvestigationResponse)
+def get_agent_investigation(case_id: str) -> AgentInvestigationResponse:
+    """Return a completed in-memory agent investigation case by identifier."""
+
+    case = agent_investigation_service.get_case(case_id)
+    if case is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Case not found.")
+    return AgentInvestigationResponse(**case)

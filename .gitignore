@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 venv/
 .venv-airflow/
+.venv-dependency-resolution/
 
 # Environment variables
 .env

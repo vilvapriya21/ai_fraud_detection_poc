@@ -4,8 +4,10 @@ from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
 from app.schemas.prediction import HealthResponse
+from app.schemas.security import SecurityEventsResponse
 from app.services.monitoring_service import monitoring_service
 from app.services.prediction_service import prediction_service
+from app.services.security_service import security_service
 
 
 router = APIRouter(tags=["operations"])
@@ -16,6 +18,13 @@ def metrics() -> dict[str, int | float | None]:
     """Return in-memory runtime metrics for prediction requests."""
 
     return monitoring_service.get_metrics()
+
+
+@router.get("/security-events", response_model=SecurityEventsResponse)
+def security_events() -> SecurityEventsResponse:
+    """Return content-free metadata for recent security control events."""
+
+    return SecurityEventsResponse(events=security_service.recent_events())
 
 
 @router.get("/health", response_model=HealthResponse)
