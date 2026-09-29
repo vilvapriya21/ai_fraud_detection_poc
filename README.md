@@ -142,6 +142,18 @@ uvicorn app.main:app --reload
 
 Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
 
+## Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+By default, frontend requests use `/api`; Vite proxies them to the FastAPI backend at `http://127.0.0.1:8000`. Leave `VITE_API_BASE_URL` unset in `frontend/.env` to use this development proxy. If you deliberately set it to a direct backend origin, add the frontend's origin to the backend `CORS_ALLOWED_ORIGINS` value in `.env`.
+
+`frontend/package-lock.json` is committed; use `npm install` to obtain the exact tested dependency tree.
+
 ## Endpoints
 
 | Method | Path | Purpose |

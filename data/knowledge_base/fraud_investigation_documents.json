@@ -24,75 +24,51 @@
     "content": "Guideline: Record the transaction facts supplied by source systems, the policy context reviewed, and the next verification step. Historical cases are context only and are not proof that a new transaction has the same outcome."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000000828",
-    "title": "Historical case CASE-TXN0000000828",
+    "document_id": "HISTORY-CASE-TXN000001",
+    "title": "Historical case CASE-TXN000001",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime domestic transaction in London, USA involved a Electronics merchant. Payment used Crypto on a Desktop device. The amount was 623.05; distance from home was 0.7 km; time since the previous transaction was 2.01 hours. Recorded observations: domestic transaction; daytime transaction; 2 failed attempts; no recent PIN change; monthly transaction frequency 13. Recorded outcome: Confirmed Friendly Fraud case."
+    "content": "Historical synthetic case summary. A night-time international transaction in Mumbai, India involved a Electronics merchant. Payment used Credit Card on a Desktop device. The amount was 48.14; distance from home was 18.1 km; time since the previous transaction was 18.19 hours. Recorded observations: international transaction; night-time transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 56. Recorded outcome: Confirmed Account Takeover case."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000008436",
-    "title": "Historical case CASE-TXN0000008436",
+    "document_id": "HISTORY-CASE-TXN000012",
+    "title": "Historical case CASE-TXN000012",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime international transaction in London, France involved a ATM Withdrawal merchant. Payment used Credit Card on a ATM device. The amount was 10.52; distance from home was 35.7 km; time since the previous transaction was 47.92 hours. Recorded observations: international transaction; daytime transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 17. Recorded outcome: Confirmed Synthetic Identity case."
+    "content": "Historical synthetic case summary. A night-time international transaction in Montreal, Canada involved a Restaurant merchant. Payment used Bank Transfer on a Desktop device. The amount was 193.18; distance from home was 22.92 km; time since the previous transaction was 0.77 hours. Recorded observations: international transaction; night-time transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 17. Recorded outcome: Confirmed Identity Theft case."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000012759",
-    "title": "Historical case CASE-TXN0000012759",
+    "document_id": "HISTORY-CASE-TXN000024",
+    "title": "Historical case CASE-TXN000024",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A night-time domestic transaction in Mexico City, India involved a ATM Withdrawal merchant. Payment used Mobile Payment on a Mobile device. The amount was 81.87; distance from home was 0.1 km; time since the previous transaction was 22.67 hours. Recorded observations: domestic transaction; night-time transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 16. Recorded outcome: Confirmed Synthetic Identity case."
+    "content": "Historical synthetic case summary. A night-time domestic transaction in London, United Kingdom involved a Electronics merchant. Payment used Bank Transfer on a Mobile device. The amount was 242.7; distance from home was 6.06 km; time since the previous transaction was 39.89 hours. Recorded observations: domestic transaction; night-time transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 11. Recorded outcome: Confirmed Identity Theft case."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000022975",
-    "title": "Historical case CASE-TXN0000022975",
+    "document_id": "HISTORY-CASE-TXN000030",
+    "title": "Historical case CASE-TXN000030",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A night-time international transaction in Melbourne, Canada involved a Fuel merchant. Payment used Credit Card on a Desktop device. The amount was 39.01; distance from home was 9 km; time since the previous transaction was 7.87 hours. Recorded observations: international transaction; night-time transaction; 1 failed attempts; recent PIN change; monthly transaction frequency 28. Recorded outcome: Confirmed Phishing case."
+    "content": "Historical synthetic case summary. A daytime domestic transaction in Vancouver, Canada involved a Crypto Exchange merchant. Payment used Digital Wallet on a Mobile device. The amount was 111.82; distance from home was 10.67 km; time since the previous transaction was 7.36 hours. Recorded observations: domestic transaction; daytime transaction; 2 failed attempts; recent PIN change; monthly transaction frequency 53. Recorded outcome: Confirmed Authorized Push Payment case."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000023844",
-    "title": "Historical case CASE-TXN0000023844",
+    "document_id": "HISTORY-CASE-TXN000056",
+    "title": "Historical case CASE-TXN000056",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime domestic transaction in Vancouver, Canada involved a Grocery merchant. Payment used Bank Transfer on a Mobile device. The amount was 14.65; distance from home was 11.4 km; time since the previous transaction was 0.17 hours. Recorded observations: domestic transaction; daytime transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 19. Recorded outcome: Confirmed Account Takeover case."
+    "content": "Historical synthetic case summary. A night-time domestic transaction in Vancouver, Canada involved a Electronics merchant. Payment used Credit Card on a Desktop device. The amount was 207.24; distance from home was 23.14 km; time since the previous transaction was 6.6 hours. Recorded observations: domestic transaction; night-time transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 32. Recorded outcome: Confirmed Card Not Present case."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000027143",
-    "title": "Historical case CASE-TXN0000027143",
+    "document_id": "HISTORY-CASE-TXN000072",
+    "title": "Historical case CASE-TXN000072",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A night-time domestic transaction in Mexico City, Brazil involved a Clothing merchant. Payment used Bank Transfer on a Mobile device. The amount was 65.2; distance from home was 6.9 km; time since the previous transaction was 13.41 hours. Recorded observations: domestic transaction; night-time transaction; 1 failed attempts; no recent PIN change; monthly transaction frequency 25. Recorded outcome: Confirmed Friendly Fraud case."
+    "content": "Historical synthetic case summary. A night-time international transaction in Birmingham, United Kingdom involved a Grocery merchant. Payment used Debit Card on a Mobile device. The amount was 76.29; distance from home was 48.55 km; time since the previous transaction was 8.93 hours. Recorded observations: international transaction; night-time transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 14. Recorded outcome: Confirmed Account Takeover case."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000027387",
-    "title": "Historical case CASE-TXN0000027387",
+    "document_id": "HISTORY-CASE-TXN000075",
+    "title": "Historical case CASE-TXN000075",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime domestic transaction in London, India involved a Healthcare merchant. Payment used Debit Card on a Mobile device. The amount was 25.26; distance from home was 0.4 km; time since the previous transaction was 8.65 hours. Recorded observations: domestic transaction; daytime transaction; 3 failed attempts; no recent PIN change; monthly transaction frequency 21. Recorded outcome: Confirmed Card Cloning case."
+    "content": "Historical synthetic case summary. A daytime international transaction in London, United Kingdom involved a Travel merchant. Payment used Credit Card on a Mobile device. The amount was 23.42; distance from home was 3.41 km; time since the previous transaction was 3.24 hours. Recorded observations: international transaction; daytime transaction; 2 failed attempts; no recent PIN change; monthly transaction frequency 48. Recorded outcome: Confirmed Card Not Present case."
   },
   {
-    "document_id": "HISTORY-CASE-TXN0000027898",
-    "title": "Historical case CASE-TXN0000027898",
+    "document_id": "HISTORY-CASE-TXN000109",
+    "title": "Historical case CASE-TXN000109",
     "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime domestic transaction in Rio, USA involved a Grocery merchant. Payment used Credit Card on a Mobile device. The amount was 46.72; distance from home was 0.7 km; time since the previous transaction was 15.04 hours. Recorded observations: domestic transaction; daytime transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 17. Recorded outcome: Confirmed Card Cloning case."
-  },
-  {
-    "document_id": "HISTORY-CASE-TXN0000028656",
-    "title": "Historical case CASE-TXN0000028656",
-    "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime domestic transaction in Berlin, USA involved a Utilities merchant. Payment used Credit Card on a Mobile device. The amount was 15.73; distance from home was 4 km; time since the previous transaction was 24.55 hours. Recorded observations: domestic transaction; daytime transaction; 0 failed attempts; recent PIN change; monthly transaction frequency 19. Recorded outcome: Confirmed Account Takeover case."
-  },
-  {
-    "document_id": "HISTORY-CASE-TXN0000039206",
-    "title": "Historical case CASE-TXN0000039206",
-    "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime domestic transaction in London, India involved a Travel merchant. Payment used Debit Card on a Mobile device. The amount was 1757.26; distance from home was 50.2 km; time since the previous transaction was 48.56 hours. Recorded observations: domestic transaction; daytime transaction; 2 failed attempts; no recent PIN change; monthly transaction frequency 20. Recorded outcome: Confirmed Phishing case."
-  },
-  {
-    "document_id": "HISTORY-CASE-TXN0000042217",
-    "title": "Historical case CASE-TXN0000042217",
-    "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A night-time domestic transaction in New York, Mexico involved a Crypto Exchange merchant. Payment used Bank Transfer on a Mobile device. The amount was 160.64; distance from home was 50 km; time since the previous transaction was 0.62 hours. Recorded observations: domestic transaction; night-time transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 20. Recorded outcome: Confirmed Identity Theft case."
-  },
-  {
-    "document_id": "HISTORY-CASE-TXN0000072774",
-    "title": "Historical case CASE-TXN0000072774",
-    "document_type": "historical_case",
-    "content": "Historical synthetic case summary. A daytime international transaction in Melbourne, UK involved a Electronics merchant. Payment used Debit Card on a Mobile device. The amount was 324.6; distance from home was 4 km; time since the previous transaction was 3.1 hours. Recorded observations: international transaction; daytime transaction; 0 failed attempts; no recent PIN change; monthly transaction frequency 22. Recorded outcome: Confirmed Identity Theft case."
+    "content": "Historical synthetic case summary. A daytime domestic transaction in Vancouver, Canada involved a Crypto Exchange merchant. Payment used Bank Transfer on a Desktop device. The amount was 19.98; distance from home was 11.14 km; time since the previous transaction was 4.22 hours. Recorded observations: domestic transaction; daytime transaction; 2 failed attempts; no recent PIN change; monthly transaction frequency 17. Recorded outcome: Confirmed Authorized Push Payment case."
   }
 ]
