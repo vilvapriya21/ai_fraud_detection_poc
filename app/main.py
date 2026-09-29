@@ -41,7 +41,7 @@ async def monitor_prediction_request(
         )
 
 
-app.include_router(prediction_router)
 app.include_router(operations_router)
+app.include_router(prediction_router)
 app.include_router(analysis_router)
 app.include_router(investigation_router)

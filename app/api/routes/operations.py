@@ -13,6 +13,19 @@ from app.services.security_service import security_service
 router = APIRouter(tags=["operations"])
 
 
+@router.get("/health", response_model=HealthResponse)
+def health() -> HealthResponse | JSONResponse:
+    """Report whether the saved fraud model is available for predictions."""
+
+    if prediction_service.model_loaded:
+        return HealthResponse(status="healthy", model_loaded=True)
+
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={"status": "unhealthy", "model_loaded": False},
+    )
+
+
 @router.get("/metrics")
 def metrics() -> dict[str, int | float | None]:
     """Return in-memory runtime metrics for prediction requests."""
@@ -25,16 +38,3 @@ def security_events() -> SecurityEventsResponse:
     """Return content-free metadata for recent security control events."""
 
     return SecurityEventsResponse(events=security_service.recent_events())
-
-
-@router.get("/health", response_model=HealthResponse)
-def health() -> HealthResponse | JSONResponse:
-    """Report whether the saved fraud model is available for predictions."""
-
-    if prediction_service.model_loaded:
-        return HealthResponse(status="healthy", model_loaded=True)
-
-    return JSONResponse(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        content={"status": "unhealthy", "model_loaded": False},
-    )
