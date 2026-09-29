@@ -84,3 +84,24 @@ def test_tool_failure_produces_qualified_summary() -> None:
     assert any("similar_case_service" in failure for failure in response["tool_failures"])
     assert "incomplete" in response["final_investigation_summary"].lower()
     assert "investigation_rag_service" in response["tools_used"]
+
+
+def test_case_is_persisted_across_service_instances(tmp_path) -> None:
+    """A stored case can be read by a new service instance using the same store."""
+
+    from app.services.agent_investigation_service import AgentInvestigationService
+
+    db_path = tmp_path / "cases.db"
+
+    AgentInvestigationService(case_store_path=db_path)._store_case(
+        {
+            "case_id": "c1",
+            "route_taken": "direct_assessment",
+        }
+    )
+
+    restored = AgentInvestigationService(
+        case_store_path=db_path
+    ).get_case("c1")
+
+    assert restored["route_taken"] == "direct_assessment"

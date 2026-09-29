@@ -1,0 +1,18 @@
+{
+  "evaluation_count": 72,
+  "case_count": 360,
+  "random_state": 42,
+  "metrics": {
+    "hit_at_1": 0.06944444444444445,
+    "hit_at_3": 0.3055555555555556,
+    "hit_at_5": 0.5,
+    "mrr": 0.26074760623554477
+  },
+  "methodology": {
+    "query_selection": "A deterministic 20% stratified sample by fraud_type from the persisted historical case records.",
+    "query_input": "The saved description for each selected case.",
+    "retrieval": "The existing SimilarCaseService with the persisted MiniLM FAISS index; the query case itself is removed before scoring.",
+    "relevance": "A retrieved case is relevant when its fraud_type matches the query case fraud_type.",
+    "metrics": "Hit@1, Hit@3, Hit@5, and mean reciprocal rank (MRR)."
+  }
+}

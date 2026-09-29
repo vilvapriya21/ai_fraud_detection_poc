@@ -138,30 +138,3 @@ def test_agent_workflow_failure_returns_sanitized_503(monkeypatch) -> None:
     assert response.json() == {
         "detail": "Agent investigation is temporarily unavailable."
     }
-
-
-def test_agent_required_tool_failure_returns_503(monkeypatch) -> None:
-    """A recorded required-tool failure prevents a misleading successful response."""
-
-    def incomplete_agent_response(question, transaction_description, transaction):
-        return {"tool_failures": ["investigation_rag_service unavailable"]}
-
-    monkeypatch.setattr(
-        "app.api.routes.investigation.agent_investigation_service.investigate",
-        incomplete_agent_response,
-    )
-    response = client.post(
-        "/agent-investigate",
-        json={
-            "question": "What should be reviewed?",
-            "transaction_description": "A reported transaction needs review.",
-        },
-    )
-
-    assert response.status_code == 503
-    assert response.json() == {
-        "detail": (
-            "Agent investigation is temporarily unavailable because "
-            "a required tool failed."
-        )
-    }

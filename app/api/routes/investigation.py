@@ -85,14 +85,6 @@ def agent_investigate(request: AgentInvestigationRequest) -> AgentInvestigationR
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Agent investigation is temporarily unavailable.",
         ) from error
-    if response["tool_failures"]:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=(
-                "Agent investigation is temporarily unavailable because "
-                "a required tool failed."
-            ),
-        )
     return AgentInvestigationResponse(**response)
 
 

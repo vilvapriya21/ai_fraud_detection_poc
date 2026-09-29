@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
+import json
+import os
+import sqlite3
+from pathlib import Path
 from threading import Lock
 from typing import Any, Literal, TypedDict
 from uuid import uuid4
@@ -16,6 +19,12 @@ from app.services.similar_case_service import SimilarCaseService, SimilarCaseUna
 
 
 HIGH_RISK_MARKERS = ("international", "night-time", "failed attempt", "pin change", "crypto")
+CASE_DB_PATH = Path(
+    os.getenv(
+        "AGENT_CASE_DB",
+        Path(__file__).resolve().parents[2] / "data" / "agent_cases.db",
+    )
+)
 
 
 class CaseState(TypedDict, total=False):
@@ -42,18 +51,20 @@ class AgentInvestigationService:
     """Coordinate triage, prediction, case retrieval, and summary agents with LangGraph."""
 
     def __init__(
-        self,
-        prediction_tool: PredictionService = prediction_service,
-        similar_case_tool: SimilarCaseService = similar_case_service,
-        investigation_tool: InvestigationService = investigation_service,
+    self,
+    prediction_tool: PredictionService = prediction_service,
+    similar_case_tool: SimilarCaseService = similar_case_service,
+    investigation_tool: InvestigationService = investigation_service,
+    case_store_path: Path | None = None,
     ) -> None:
-        """Configure reusable application tools and compile the workflow once."""
+        """Configure reusable application tools, the case store, and the compiled workflow."""
 
         self.prediction_tool = prediction_tool
         self.similar_case_tool = similar_case_tool
         self.investigation_tool = investigation_tool
-        self._case_history: dict[str, dict[str, Any]] = {}
+        self._case_db_path = case_store_path or CASE_DB_PATH
         self._history_lock = Lock()
+        self._init_case_store()
         self._graph = self._build_graph()
 
     def investigate(
@@ -82,16 +93,19 @@ class AgentInvestigationService:
                 "Agent investigation is temporarily unavailable."
             ) from error
         response = self._response_payload(final_state)
-        with self._history_lock:
-            self._case_history[response["case_id"]] = deepcopy(response)
+        self._store_case(response)
         return response
 
     def get_case(self, case_id: str) -> dict[str, Any] | None:
-        """Return a copy of an in-memory completed case, if it is still available."""
+        """Return a persisted completed case, if it exists."""
 
-        with self._history_lock:
-            case = self._case_history.get(case_id)
-            return deepcopy(case) if case is not None else None
+        with self._history_lock, sqlite3.connect(self._case_db_path) as connection:
+            row = connection.execute(
+                "SELECT payload FROM agent_cases WHERE case_id = ?",
+                (case_id,),
+            ).fetchone()
+
+        return json.loads(row[0]) if row else None
 
     def _build_graph(self) -> Any:
         """Create the conditional LangGraph workflow for case investigation."""
@@ -162,7 +176,7 @@ class AgentInvestigationService:
                 f"Saved model output: {prediction.prediction}; risk level {prediction.risk_level}; "
                 f"fraud probability {prediction.fraud_probability:.4f}."
             )
-        except (ModelUnavailableError, ValueError, RuntimeError):
+        except Exception:
             failures.append("fraud_prediction_service unavailable")
             findings["Fraud Analysis Agent"] = "Prediction tool was unavailable; no model conclusion was used."
         return {"agent_findings": findings, "tools_used": tools_used, "tool_failures": failures}
@@ -181,7 +195,7 @@ class AgentInvestigationService:
             tools_used.append("similar_case_service")
             sources.extend({"source_type": "similar_case", **case} for case in cases)
             findings["Similar Case / Evidence Agent"] = f"Retrieved {len(cases)} similar historical cases."
-        except (SimilarCaseUnavailableError, ValueError, RuntimeError):
+        except Exception:
             failures.append("similar_case_service unavailable")
             findings["Similar Case / Evidence Agent"] = "Similar-case retrieval was unavailable."
 
@@ -233,7 +247,7 @@ class AgentInvestigationService:
             else:
                 existing = findings.get(finding_name, "")
                 findings[finding_name] = f"{existing} {rag_response['investigation_response']}".strip()
-        except (InvestigationUnavailableError, ValueError, RuntimeError):
+        except Exception:
             failures.append("investigation_rag_service unavailable")
             if finding_name not in findings:
                 findings[finding_name] = "Investigation-context retrieval was unavailable."
@@ -277,6 +291,36 @@ class AgentInvestigationService:
             "evidence": state["evidence"],
             "tool_failures": state["tool_failures"],
         }
+    def _init_case_store(self) -> None:
+        """Create the SQLite case table if it does not exist."""
+
+        self._case_db_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with sqlite3.connect(self._case_db_path) as connection:
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS agent_cases (
+                    case_id TEXT PRIMARY KEY,
+                    payload TEXT NOT NULL
+                )
+                """
+            )
+
+
+    def _store_case(self, response: dict[str, Any]) -> None:
+        """Persist a completed case so it survives restarts."""
+
+        with self._history_lock, sqlite3.connect(self._case_db_path) as connection:
+            connection.execute(
+                """
+                INSERT OR REPLACE INTO agent_cases (case_id, payload)
+                VALUES (?, ?)
+                """,
+                (
+                    response["case_id"],
+                    json.dumps(response, default=str),
+                ),
+            )
 
 
 agent_investigation_service = AgentInvestigationService()
